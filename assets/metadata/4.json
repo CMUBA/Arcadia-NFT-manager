@@ -1,0 +1,12 @@
+{
+  "name": "Hero #4",
+  "description": "Hero 4 in the Heroes collection",
+  "image": "https://your-image-hosting-url.com//hero.png",
+  "external_url": "https://arcadia.cmuba.org/4",
+  "attributes": [
+    {
+      "trait_type": "Hero Number",
+      "value": "4"
+    }
+  ]
+}

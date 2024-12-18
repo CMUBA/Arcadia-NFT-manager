@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero NFT Generator</title>
+    <style>
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .hero-card {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+        }
+        .hero-card img {
+            max-width: 100%;
+            height: auto;
+        }
+        .generate-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .generate-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Hero NFT Generator</h1>
+        <button class="generate-btn" onclick="generateMetadata()">Generate Metadata</button>
+        <div class="hero-grid" id="heroGrid">
+            <!-- Heroes will be displayed here -->
+        </div>
+    </div>
+
+    <script>
+        // Load and display heroes
+        async function loadHeroes() {
+            const totalHeroes = 10; // Match this with your generateMetadata.js configuration
+            const heroGrid = document.getElementById('heroGrid');
+            
+            for (let i = 1; i <= totalHeroes; i++) {
+                try {
+                    const response = await fetch(`/assets/metadata/${i}.json`);
+                    const metadata = await response.json();
+                    
+                    const heroCard = document.createElement('div');
+                    heroCard.className = 'hero-card';
+                    heroCard.innerHTML = `
+                        <img src="${metadata.image || 'placeholder.png'}" alt="${metadata.name}">
+                        <h3>${metadata.name}</h3>
+                        <p>${metadata.description}</p>
+                    `;
+                    heroGrid.appendChild(heroCard);
+                } catch (error) {
+                    console.error(`Error loading hero #${i}:`, error);
+                }
+            }
+        }
+
+        // Function to trigger metadata generation
+        async function generateMetadata() {
+            try {
+                const response = await fetch('/generate-metadata', { method: 'POST' });
+                const result = await response.json();
+                alert(result.message);
+                // Reload the page to show new metadata
+                location.reload();
+            } catch (error) {
+                alert('Error generating metadata: ' + error.message);
+            }
+        }
+
+        // Load heroes when page loads
+        window.onload = loadHeroes;
+    </script>
+</body>
+</html> 

@@ -1,0 +1,25 @@
+{
+  "name": "assets-more",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "jhfnetboy",
+  "license": "GPL-3.0",
+  "description": "arcadia nft manager",
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CMUBA/Arcadia-NFT-manager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/CMUBA/Arcadia-NFT-manager/issues"
+  },
+  "homepage": "https://github.com/CMUBA/Arcadia-NFT-manager#readme"
+}
