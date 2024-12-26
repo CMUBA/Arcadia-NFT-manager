@@ -43,7 +43,6 @@
             gap: 10px;
             align-items: center;
         }
-        
         .input-group input {
             padding: 8px;
             font-size: 16px;
@@ -51,11 +50,27 @@
             border-radius: 4px;
             width: 100px;
         }
-        
-        .error-message {
-            color: #ff0000;
-            margin-top: 5px;
-            display: none;
+        .attribute-group {
+            margin: 5px 0;
+            text-align: left;
+        }
+        .attribute-group select {
+            padding: 5px;
+            margin-left: 5px;
+            border-radius: 3px;
+            border: 1px solid #ccc;
+        }
+        .save-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .save-btn:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
@@ -67,7 +82,6 @@
             <input type="number" id="heroCount" min="1" max="100" value="10">
             <button class="generate-btn" onclick="generateMetadata()">Generate Heroes</button>
         </div>
-        <div id="error-message" class="error-message"></div>
         <div class="hero-grid" id="heroGrid">
             <!-- Heroes will be displayed here -->
         </div>
@@ -79,7 +93,6 @@
             const totalHeroes = parseInt(heroCount) || 10;
             const heroGrid = document.getElementById('heroGrid');
             
-            // 清空现有的英雄卡片
             heroGrid.innerHTML = '';
             
             for (let i = 1; i <= totalHeroes; i++) {
@@ -93,9 +106,37 @@
                     const heroCard = document.createElement('div');
                     heroCard.className = 'hero-card';
                     heroCard.innerHTML = `
-                        <img src="/assets/images/default-hero.jpg" alt="${metadata.name}">
+                        <img src="/assets/images/hero${i}.jpg" 
+                             onerror="this.src='/assets/images/default-hero.jpg'" 
+                             alt="${metadata.name}">
                         <h3>${metadata.name}</h3>
                         <p>${metadata.description}</p>
+                        <div class="hero-attributes">
+                            <div class="attribute-group">
+                                <label>Race:</label>
+                                <select class="race-select" data-hero-id="${i}">
+                                    <option value="human" ${metadata.attributes.find(a => a.trait_type === "race")?.value === "human" ? 'selected' : ''}>Human</option>
+                                    <option value="elf" ${metadata.attributes.find(a => a.trait_type === "race")?.value === "elf" ? 'selected' : ''}>Elf</option>
+                                    <option value="dwarf" ${metadata.attributes.find(a => a.trait_type === "race")?.value === "dwarf" ? 'selected' : ''}>Dwarf</option>
+                                </select>
+                            </div>
+                            <div class="attribute-group">
+                                <label>Class:</label>
+                                <select class="class-select" data-hero-id="${i}">
+                                    <option value="warrior" ${metadata.attributes.find(a => a.trait_type === "class")?.value === "warrior" ? 'selected' : ''}>Warrior</option>
+                                    <option value="mage" ${metadata.attributes.find(a => a.trait_type === "class")?.value === "mage" ? 'selected' : ''}>Mage</option>
+                                    <option value="rogue" ${metadata.attributes.find(a => a.trait_type === "class")?.value === "rogue" ? 'selected' : ''}>Rogue</option>
+                                </select>
+                            </div>
+                            <div class="attribute-group">
+                                <label>Gender:</label>
+                                <select class="gender-select" data-hero-id="${i}">
+                                    <option value="male" ${metadata.attributes.find(a => a.trait_type === "gender")?.value === "male" ? 'selected' : ''}>Male</option>
+                                    <option value="female" ${metadata.attributes.find(a => a.trait_type === "gender")?.value === "female" ? 'selected' : ''}>Female</option>
+                                </select>
+                            </div>
+                            <button class="save-btn" onclick="saveHeroAttributes(${i})">Save Changes</button>
+                        </div>
                     `;
                     heroGrid.appendChild(heroCard);
                 } catch (error) {
@@ -104,11 +145,42 @@
             }
         }
 
+        async function saveHeroAttributes(heroId) {
+            try {
+                const card = document.querySelector(`[data-hero-id="${heroId}"]`).closest('.hero-card');
+                const race = card.querySelector('.race-select').value;
+                const heroClass = card.querySelector('.class-select').value;
+                const gender = card.querySelector('.gender-select').value;
+
+                const response = await fetch(`/update-hero/${heroId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        race,
+                        class: heroClass,
+                        gender
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.message || 'Failed to update hero attributes');
+                }
+
+                alert(result.message);
+            } catch (error) {
+                console.error('Error saving attributes:', error);
+                alert(error.message || 'Error saving attributes. Please try again.');
+            }
+        }
+
         async function generateMetadata() {
             const heroCount = document.getElementById('heroCount').value;
             const count = parseInt(heroCount);
             
-            // 输入验证
             if (!count || count < 1 || count > 100) {
                 alert('Please enter a valid number between 1 and 100');
                 return;
@@ -129,7 +201,7 @@
                 
                 const result = await response.json();
                 alert(result.message);
-                await loadHeroes(); // 重新加载英雄
+                await loadHeroes();
             } catch (error) {
                 alert('Error generating metadata: ' + error.message);
             }
