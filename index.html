@@ -72,6 +72,18 @@
         .save-btn:hover {
             background-color: #45a049;
         }
+        .load-btn {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .load-btn:hover {
+            background-color: #1976D2;
+        }
     </style>
 </head>
 <body>
@@ -81,6 +93,7 @@
             <label for="heroCount">Number of Heroes:</label>
             <input type="number" id="heroCount" min="1" max="100" value="10">
             <button class="generate-btn" onclick="generateMetadata()">Generate Heroes</button>
+            <button class="load-btn" onclick="loadHeroes()">Load Heroes</button>
         </div>
         <div class="hero-grid" id="heroGrid">
             <!-- Heroes will be displayed here -->
@@ -95,11 +108,14 @@
             
             heroGrid.innerHTML = '';
             
+            let loadedCount = 0;
+            
             for (let i = 1; i <= totalHeroes; i++) {
                 try {
                     const response = await fetch(`/assets/metadata/${i}.json`);
                     if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
+                        console.log(`Skipping hero #${i}: Not found`);
+                        continue;
                     }
                     const metadata = await response.json();
                     
@@ -139,9 +155,18 @@
                         </div>
                     `;
                     heroGrid.appendChild(heroCard);
+                    loadedCount++;
                 } catch (error) {
                     console.error(`Error loading hero #${i}:`, error);
                 }
+            }
+            
+            if (loadedCount === 0) {
+                const message = document.createElement('div');
+                message.style.textAlign = 'center';
+                message.style.gridColumn = '1 / -1';
+                message.innerHTML = 'No heroes found. Generate some heroes first!';
+                heroGrid.appendChild(message);
             }
         }
 
@@ -208,7 +233,11 @@
         }
 
         // 页面加载时初始化
-        window.onload = loadHeroes;
+        window.onload = function() {
+            // 只加载页面，不自动生成或加载英雄
+            document.getElementById('heroGrid').innerHTML = 
+                '<div style="text-align: center; grid-column: 1 / -1;">Click "Load Heroes" to view existing heroes</div>';
+        };
     </script>
 </body>
 </html> 
