@@ -1,36 +1,55 @@
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 
-// Configuration
-const TOTAL_HEROES = 10; // Change this to your desired number of heroes
-const OUTPUT_DIR = './assets/metadata';
-const IMAGE_BASE_URL = 'https://your-image-hosting-url.com/'; // Update this with your image URL
+function generateMetadata(totalHeroes) {
+    // Configuration
+    const OUTPUT_DIR = './assets/metadata';
+    
+    // Create output directory if it doesn't exist
+    if (!fs.existsSync(OUTPUT_DIR)) {
+        fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+    }
 
-// Create output directory if it doesn't exist
-if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+    // Generate metadata for each hero
+    for (let i = 1; i <= totalHeroes; i++) {
+        const metadata = {
+            name: `Hero #${i}`,
+            description: `Hero ${i} in the Heroes collection`,
+            image: '',
+            external_url: `https://arcadia.cmuba.org/${i}`,
+            attributes: [
+                {
+                    "trait_type": "Hero Number",
+                    "value": i.toString()
+                },
+                {
+                    "trait_type": "race",
+                    "value": "human"
+                },
+                {
+                    "trait_type": "class",
+                    "value": "warrior"
+                },
+                {
+                    "trait_type": "gender",
+                    "value": "male"
+                }
+            ]
+        };
+
+        // Write metadata to JSON file
+        const fileName = path.join(OUTPUT_DIR, `${i}.json`);
+        fs.writeFileSync(fileName, JSON.stringify(metadata, null, 2));
+        console.log(`Generated metadata for Hero #${i}`);
+    }
+
+    return { success: true, message: 'Metadata generation complete!' };
 }
 
-// Generate metadata for each hero
-for (let i = 1; i <= TOTAL_HEROES; i++) {
-    const metadata = {
-        name: `Hero #${i}`,
-        description: `Hero ${i} in the Heroes collection`,
-        image: `${IMAGE_BASE_URL}/hero.png`, // All heroes use the same image
-        external_url: `https://arcadia.cmuba.org/${i}`,
-        attributes: [
-            {
-                trait_type: "Hero Number",
-                value: i.toString()
-            }
-            // Add more attributes as needed
-        ]
-    };
-
-    // Write metadata to JSON file
-    const fileName = path.join(OUTPUT_DIR, `${i}.json`);
-    fs.writeFileSync(fileName, JSON.stringify(metadata, null, 2));
-    console.log(`Generated metadata for Hero #${i}`);
+// 如果直接运行此文件
+if (require.main === module) {
+    const totalHeroes = process.argv[2] ? parseInt(process.argv[2]) : 10;
+    generateMetadata(totalHeroes);
 }
 
-console.log('Metadata generation complete!'); 
+module.exports = { generateMetadata }; 

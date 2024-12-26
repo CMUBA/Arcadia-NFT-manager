@@ -37,32 +37,63 @@
         .generate-btn:hover {
             background-color: #45a049;
         }
+        .input-group {
+            margin: 20px 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .input-group input {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 100px;
+        }
+        
+        .error-message {
+            color: #ff0000;
+            margin-top: 5px;
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Hero NFT Generator</h1>
-        <button class="generate-btn" onclick="generateMetadata()">Generate Metadata</button>
+        <div class="input-group">
+            <label for="heroCount">Number of Heroes:</label>
+            <input type="number" id="heroCount" min="1" max="100" value="10">
+            <button class="generate-btn" onclick="generateMetadata()">Generate Heroes</button>
+        </div>
+        <div id="error-message" class="error-message"></div>
         <div class="hero-grid" id="heroGrid">
             <!-- Heroes will be displayed here -->
         </div>
     </div>
 
     <script>
-        // Load and display heroes
         async function loadHeroes() {
-            const totalHeroes = 10; // Match this with your generateMetadata.js configuration
+            const heroCount = document.getElementById('heroCount').value;
+            const totalHeroes = parseInt(heroCount) || 10;
             const heroGrid = document.getElementById('heroGrid');
+            
+            // 清空现有的英雄卡片
+            heroGrid.innerHTML = '';
             
             for (let i = 1; i <= totalHeroes; i++) {
                 try {
                     const response = await fetch(`/assets/metadata/${i}.json`);
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
                     const metadata = await response.json();
                     
                     const heroCard = document.createElement('div');
                     heroCard.className = 'hero-card';
                     heroCard.innerHTML = `
-                        <img src="${metadata.image || 'placeholder.png'}" alt="${metadata.name}">
+                        <img src="/assets/images/default-hero.jpg" alt="${metadata.name}">
                         <h3>${metadata.name}</h3>
                         <p>${metadata.description}</p>
                     `;
@@ -73,20 +104,38 @@
             }
         }
 
-        // Function to trigger metadata generation
         async function generateMetadata() {
+            const heroCount = document.getElementById('heroCount').value;
+            const count = parseInt(heroCount);
+            
+            // 输入验证
+            if (!count || count < 1 || count > 100) {
+                alert('Please enter a valid number between 1 and 100');
+                return;
+            }
+
             try {
-                const response = await fetch('/generate-metadata', { method: 'POST' });
+                const response = await fetch('/generate-metadata', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ totalHeroes: count })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
                 const result = await response.json();
                 alert(result.message);
-                // Reload the page to show new metadata
-                location.reload();
+                await loadHeroes(); // 重新加载英雄
             } catch (error) {
                 alert('Error generating metadata: ' + error.message);
             }
         }
 
-        // Load heroes when page loads
+        // 页面加载时初始化
         window.onload = loadHeroes;
     </script>
 </body>

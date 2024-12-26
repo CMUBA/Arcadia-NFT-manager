@@ -1,12 +1,24 @@
 {
   "name": "Hero #9",
   "description": "Hero 9 in the Heroes collection",
-  "image": "https://your-image-hosting-url.com//hero.png",
+  "image": "/assets/images/default-hero.jpg",
   "external_url": "https://arcadia.cmuba.org/9",
   "attributes": [
     {
       "trait_type": "Hero Number",
       "value": "9"
+    },
+    {
+      "trait_type": "race",
+      "value": "human"
+    },
+    {
+      "trait_type": "class",
+      "value": "warrior"
+    },
+    {
+      "trait_type": "gender",
+      "value": "male"
     }
   ]
 }

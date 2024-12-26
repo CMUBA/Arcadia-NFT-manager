@@ -1,12 +1,12 @@
 {
-  "name": "Hero #5",
-  "description": "Hero 5 in the Heroes collection",
+  "name": "Hero #13",
+  "description": "Hero 13 in the Heroes collection",
   "image": "/assets/images/default-hero.jpg",
-  "external_url": "https://arcadia.cmuba.org/5",
+  "external_url": "https://arcadia.cmuba.org/13",
   "attributes": [
     {
       "trait_type": "Hero Number",
-      "value": "5"
+      "value": "13"
     },
     {
       "trait_type": "race",
