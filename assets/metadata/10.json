@@ -1,7 +1,7 @@
 {
   "name": "Hero #10",
   "description": "Hero 10 in the Heroes collection",
-  "image": "/assets/images/default-hero.jpg",
+  "image": "",
   "external_url": "https://arcadia.cmuba.org/10",
   "attributes": [
     {
@@ -18,7 +18,7 @@
     },
     {
       "trait_type": "gender",
-      "value": "male"
+      "value": "female"
     }
   ]
 }
